@@ -54,38 +54,46 @@ void rssi_to_distance(Marker tab[3]){
 	}
 }
 
-void init_marker(Marker b, int num){
-	b.num=num;
+void init_marker(Marker b, int num, int a, int b){
+	
 	switch(num){
 		case 0:
+			b.num=num;
 			b.x=0;
 			b.y=0;
 			b.rssi=0;
+			b.dist=0.0;
 			break;
 
 		case 1:
+			b.num=num;
 			b.x=0;
-			b.y=A;
+			b.y=a;
 			b.rssi=0;
+			b.dist=0.0;
 			break;	
 
 		case 2:
-			b.x=B;
-			b.y=A;
+			b.num=num;
+			b.x=b;
+			b.y=a;
 			b.rssi=0;
+			b.dist=0.0;
 			break;
 
 		case 3:
-			b.x=B;
+			b.num=num;
+			b.x=b;
 			b.y=0;
 			b.rssi=0;
+			b.dist=0.0;
 			break;	
 	}
 }
 
-void print_marker(Marker tab[4]){
+void print_markers(Marker tab[],int size){
 	int i;
-	for(i=0;i<4;i++)
+	for(i=0;i<size;i++)
 		printf("balise %d, x=%d, y=%d, rssi=%d, dist=%f\n",tab[i].num,tab[i].x,tab[i].y,tab[i].rssi,tab[i].dist);
 }
 
@@ -98,13 +106,13 @@ int main(void)
 		printf("erreur ouverture fichier..\n");
 		exit (0);
 	}
-*/
+	*/
 
 	Marker b0,b1,b2,b3;
-	init_marker(b0,0);
-	init_marker(b1,1);
-	init_marker(b2,2);
-	init_marker(b3,3);
+	init_marker(b0,0,A,B);
+	init_marker(b1,1,A,B);
+	init_marker(b2,2,A,B);
+	init_marker(b3,3,A,B);
 
 	int i;
 
@@ -114,10 +122,12 @@ int main(void)
 	for(i=0;i<3;i++)
 		printf("%d\t",closest[i].num);
 	printf("\n");
+
+	print_markers(dist,4);
 	
 	rssi_to_distance(closest);
 
-	print_marker(closest);
+	print_marker(closest,3);
 
 	return 0;	
 }
