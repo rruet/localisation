@@ -1,4 +1,5 @@
 /*************************************/
+/**********Fonctions pour*************/
 /*******Algo de localisation**********/
 /*********par trilateration***********/
 /*************************************/
@@ -7,10 +8,10 @@
 
 #define A 4
 #define B 7
-#define MAX_LINE 19
+#define N 1.1
 
-//Determin which markers are the closest from the badge
-void closest_devices(Marker *dist, Marker *closest)
+//Determin which markers are the closest from the badge and returns the farthest
+int closest_devices(Marker *dist, Marker *closest)
 {	
 	int i;	
 	int min=0;
@@ -44,108 +45,112 @@ void closest_devices(Marker *dist, Marker *closest)
             closest[2]=dist[2];
             break;
 
-	}	
+	}
+	return min;	
 }
 
-void rssi_to_distance(Marker tab[3]){
+//convert received signal power into a distance
+void rssi_to_distance(Marker* tab){
 	int i;
-	for(i=0;i<4;i++){
-		float expo=(-60.0 - tab[i].rssi)/10;
-		tab[i].dist=pow(10.0,expo)*1000;
+	for(i=0;i<3;i++){
+		float expo=(-60.0 - tab[i].rssi)/(N*10);
+		tab[i].dist=pow(10.0,expo);
 	}
 }
 
+//initialise a marker
 void init_marker(Marker *bal, int num){
 	
 	switch(num){
 		case 0:
 			(*bal).num=num;
-			(*bal).x=0;
-			(*bal).y=0;
+			(*bal).coor.x=0;
+			(*bal).coor.x=0;
 			(*bal).rssi=0;
 			(*bal).dist=0.0;
 			break;
 
 		case 1:
 			(*bal).num=num;
-			(*bal).x=0;
-			(*bal).y=A;
+			(*bal).coor.x=0;
+			(*bal).coor.y=A;
 			(*bal).rssi=0;
 			(*bal).dist=0.0;
 			break;	
 
 		case 2:
 			(*bal).num=num;
-			(*bal).x=B;
-			(*bal).y=A;
+			(*bal).coor.x=B;
+			(*bal).coor.y=A;
 			(*bal).rssi=0;
 			(*bal).dist=0.0;
 			break;
 
 		case 3:
 			(*bal).num=num;
-			(*bal).x=B;
-			(*bal).y=0;
+			(*bal).coor.x=B;
+			(*bal).coor.y=0;
 			(*bal).rssi=0;
 			(*bal).dist=0.0;
 			break;	
 	}
 }
 
+//initialise all the markers
 void init_markers(Marker *dist){
 	int i;
 	for(i=0;i<4;i++)
 		init_marker(&dist[i],i);
 }
 
+
+//print informations about the markers
 void print_markers(Marker *tab, int size){
 	int i;
 	for(i=0;i<size;i++)
-		printf("balise %d, x=%d, y=%d, rssi=%d, dist=%f\n",tab[i].num,tab[i].x,tab[i].y,tab[i].rssi,tab[i].dist);
+		printf("balise %d, x=%f, y=%f, rssi=%d, dist=%f m\n",tab[i].num,tab[i].coor.x,tab[i].coor.y,tab[i].rssi,tab[i].dist);
 }
 
-int main(void)
-{
-	//ouverture du fichier contenant les rssi envoyés depuis le badge
-	FILE *f = fopen("data.txt","r+");
+float square(float a){
+	return a*a;
+}
 
-	if (f == NULL){
-		printf("erreur ouverture fichier..\n");
-		exit (0);
+///////////////////////////////////////////////////////////////////////////////
+//This function takes the three closest markers of the badge and determinates//
+//its coordinates.                                                           //
+//here are the markers' circle equations :                                   //
+//				x^2 + y^2= d1^2 for marker0                                     //
+//				x^2 + (y-A)^2= d2^2 for marker1                                 //
+//			(x-B)^2 + (y-A)^2= d3^2 for marker2                                 //
+//				(x-B)^2 + y^2= d4^2 for marker3                                 //
+///////////////////////////////////////////////////////////////////////////////
+
+void trilateration(Marker *markers, int farther_marker, Coordinates *res){
+
+	float x,y;
+
+	switch(farther_marker){
+
+		case(0):
+			x=(square(B)-square(markers[2].dist)+square(markers[1].dist))/(2*B);
+			y=(square(markers[2].dist)-square(markers[3].dist)-square(A))/(-2*A);
+			break;
+
+		case(1):
+			x=(square(B)-square(markers[3].dist)+square(markers[0].dist))/(2*B);
+			y=(square(markers[2].dist)-square(markers[3].dist)-square(A))/(-2*A);
+			break;
+
+		case(2):
+			x=(square(B)-square(markers[3].dist)+square(markers[0].dist))/(2*B);
+			y=A/2+(square(markers[0].dist)-square(markers[1].dist))/(2*A);
+			break;
+
+		case(3):
+			x=(square(B)-square(markers[2].dist)+square(markers[1].dist))/(2*B);
+			y=A/2+(square(markers[0].dist)-square(markers[1].dist))/(2*A);
+			break;
 	}
-
-	Marker *dist=malloc(4*sizeof(Marker));
-	init_markers(dist);
-	print_markers(dist,4);
-
-	char* line=malloc(MAX_LINE*sizeof(char));
-	fgets(line,MAX_LINE,f);
-
-	printf("%s\n",line);
-
-	int rssi[4];
-	sscanf(line,"%d %d %d %d\n",&rssi[0],&rssi[1],&rssi[2],&rssi[3]);
-
-	int i;
-	for(i=0;i<4;i++)
-		printf("rssi %d = %d\n",i,rssi[i]);
-
-	for(i=0;i<4;i++)
-		dist[i].rssi=rssi[i];
-
-	Marker *closest=malloc(3*sizeof(Marker));
-	closest_devices(dist,closest);
-
-	print_markers(closest,3);
-	//for(i=0;i<3;i++)
-	//	printf("%d\t",closest[i].num);
-	//printf("\n");
-	
-	//rssi_to_distance(closest);
-
-	//print_markers(closest,3);
-
-	free(dist);
-	return 0;	
-}
-
+	(*res).x=x;
+	(*res).y=y;
+} 
