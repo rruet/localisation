@@ -61,15 +61,17 @@ int main(void)
 
 	print_markers(closest,3);
 
-	//rssi_to_distance(closest);
+	rssi_to_distance(closest);
 
 	printf("\nrssi to distance conversion :\n\n");
 
 	//example
-	closest[0].dist=2.466666;
-	closest[1].dist=2.466666;
-	closest[2].dist=4.466666;
+	//closest[0].dist=2.466666;
+	//closest[1].dist=2.466666;
+	//closest[2].dist=4.466666;
 	//
+
+	//distance_to_rssi(closest);
 
 	print_markers(closest,3);
 

@@ -16,6 +16,7 @@ typedef struct bal{
 
 int closest_devices(Marker *dist, Marker *closest);
 void rssi_to_distance(Marker *tab);
+void distance_to_rssi(Marker *tab);
 void init_marker(Marker *bal, int num);
 void init_markers(Marker *);
 void print_markers(Marker *tab,int size);

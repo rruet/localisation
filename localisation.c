@@ -9,6 +9,7 @@
 #define A 4
 #define B 7
 #define N 1.1
+#define A_REF 60.0
 
 //Determin which markers are the closest from the badge and returns the farthest
 int closest_devices(Marker *dist, Marker *closest)
@@ -53,8 +54,15 @@ int closest_devices(Marker *dist, Marker *closest)
 void rssi_to_distance(Marker* tab){
 	int i;
 	for(i=0;i<3;i++){
-		float expo=(-60.0 - tab[i].rssi)/(N*10);
+		float expo=(-A_REF - tab[i].rssi)/(N*10);
 		tab[i].dist=pow(10.0,expo);
+	}
+}
+
+void distance_to_rssi(Marker *tab){
+	int i;
+	for(i=0;i<3;i++){
+		tab[i].rssi=(-10*N)*log(tab[i].dist)-A_REF;
 	}
 }
 
@@ -119,10 +127,10 @@ float square(float a){
 //This function takes the three closest markers of the badge and determinates//
 //its coordinates.                                                           //
 //here are the markers' circle equations :                                   //
-//				x^2 + y^2= d1^2 for marker0                                     //
-//				x^2 + (y-A)^2= d2^2 for marker1                                 //
-//			(x-B)^2 + (y-A)^2= d3^2 for marker2                                 //
-//				(x-B)^2 + y^2= d4^2 for marker3                                 //
+//				x^2 + y^2= d1^2 for marker0                                  //
+//				x^2 + (y-A)^2= d2^2 for marker1                              //
+//			(x-B)^2 + (y-A)^2= d3^2 for marker2                              //
+//				(x-B)^2 + y^2= d4^2 for marker3                              //
 ///////////////////////////////////////////////////////////////////////////////
 
 void trilateration(Marker *markers, int farther_marker, Coordinates *res){
