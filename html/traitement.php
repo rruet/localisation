@@ -1,25 +1,10 @@
 <?php
+	header("Content-type: text/json");
 
-
-	$tab = file('coor.txt');
-	$ligne = $tab[count($tab)-1];
-	//echo $ligne;
-	//echo "</br>";	
-
-
-	$n = sscanf($ligne,"%f %f\n",$x,$y);
-	//echo $x;
-	//echo "</br>";
-	//echo $y;
-	echo "<table border='1'>              
-                        <Caption>Coordonn&eacute;es instantann&eacute;es</caption>
-                                <TR> 
-                                <TH>X</TH>         
-                                <TH>Y</TH> 
-                                </TR>
-                                <TR>
-                                <TD>'$x'</TD>         
-                                <TD>'$y'</TD>          
-                                </TR>   
-                </table>";
+	$file = file('coor.txt');
+	$ligne = $file[count($file)-1];
+	$n = sscanf($ligne,"%f,%f",$x,$y);
+	$res=array($x,$y);
+	echo json_encode($res);
+	
 ?>

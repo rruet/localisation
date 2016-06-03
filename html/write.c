@@ -24,12 +24,19 @@ int main(void){
 			exit(0);
 		}
 
-		if(choix){
-			fputs("2.1 4.2\n",f);
-			choix=0;
-		}else{
-			fputs("3.2 6.0\n",f);
-			choix=1;
+		switch(choix){
+			case 0:
+				fputs("2.1,3.2\n",f);
+				choix=1;
+				break;
+			case 1:
+				fputs("6.0,1.54\n",f);
+				choix=2;
+				break;
+			case 2:
+				fputs("3.0,2.0\n",f);
+				choix=0;
+				break;	
 		}
 		my_delay(3);
 		
