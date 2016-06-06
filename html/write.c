@@ -26,15 +26,15 @@ int main(void){
 
 		switch(choix){
 			case 0:
-				fputs("2.1,3.2\n",f);
+				fputs("2.1,3.2;2.0,4.0\n",f);
 				choix=1;
 				break;
 			case 1:
-				fputs("6.0,1.54\n",f);
+				fputs("6.0,1.54;3.0,4.0\n",f);
 				choix=2;
 				break;
 			case 2:
-				fputs("3.0,2.0\n",f);
+				fputs("3.0,2.0;0.2,7.0\n",f);
 				choix=0;
 				break;	
 		}
